@@ -1,29 +1,33 @@
-#!/bin/sh
+#! /bin/sh
 
-HAYSTACK=$1
+HAYSTACK=($1)
 NEEDLE=$2
 DELIM=" "
-while getopts ":d:" opt; do
-	case ${opt} in
+while getopts ":d:" OPT; do
+	case $OPT in
 		d )
-			if [ ${#DELIM[@]} -neq 1 ]; then
-				echo "Invalid use: [-d] takes a single character as argument."
-				return
-			fi
 			DELIM=$OPTARG
+			if [ ${#DELIM} -ne 1 ]; then
+				echo "Invalid use: [-d] takes a single character as argument." >&2
+				exit 1
+			fi
 			;;
 		\? )
-			echo "usage: haystack needle [-d delim]"
+			echo "usage: strstr.sh haystack needle [-d delim]" >&2
+			exit 1
 			;;
 		: )
-			echo "Invalid option: $OPTARG requires an argument"
-			return
+			echo "Invalid option: -$OPT requires an argument" >&2
+			exit 1
 			;;
 	esac
 done
-INDEX=1
-while [ "${cut -d$DELIM -f$INDEX}" != "$NEEDLE" ]; do
-	INDEX++
+INDEX=0
+IFS=$DELIM
+LEN=${#HAYSTACK[@]}
+while (( $INDEX < $LEN )) && [[ "${HAYSTACK[$INDEX]}" != "$NEEDLE" ]]; do
+	((INDEX++))
 done
-shift $((OPTIND -1))
-echo "${cut -d$DELIM INDEX}"
+if (( $INDEX < $LEN)); then
+	echo "$((INDEX + 1))"
+fi
