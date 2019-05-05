@@ -1,33 +1,18 @@
 #! /bin/sh
 
-HAYSTACK=($1)
+if (( $# != 2 )); then
+	echo "Usage: strstr.sh haystack needle" >&2
+	exit 1
+fi
+HAYSTACK=$1
+LEN_HAYSTACK=${#HAYSTACK}
 NEEDLE=$2
-DELIM=" "
-while getopts ":d:" OPT; do
-	case $OPT in
-		d )
-			DELIM=$OPTARG
-			if [ ${#DELIM} -ne 1 ]; then
-				echo "Invalid use: [-d] takes a single character as argument." >&2
-				exit 1
-			fi
-			;;
-		\? )
-			echo "usage: strstr.sh haystack needle [-d delim]" >&2
-			exit 1
-			;;
-		: )
-			echo "Invalid option: -$OPT requires an argument" >&2
-			exit 1
-			;;
-	esac
-done
+LEN_NEEDLE=${#NEEDLE}
 INDEX=0
-IFS=$DELIM
-LEN=${#HAYSTACK[@]}
-while (( $INDEX < $LEN )) && [[ "${HAYSTACK[$INDEX]}" != "$NEEDLE" ]]; do
+while (( $((INDEX + LEN_NEEDLE)) < LEN_HAYSTACK )); do
+	if [[ "${HAYSTACK:INDEX:LEN_NEEDLE}" == "$NEEDLE" ]]; then
+		echo "$INDEX"
+		exit 0
+	fi
 	((INDEX++))
 done
-if (( $INDEX < $LEN)); then
-	echo "$((INDEX + 1))"
-fi
