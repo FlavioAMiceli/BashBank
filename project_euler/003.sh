@@ -7,10 +7,14 @@
 find_next_prime()
 {
   PRIMES=$1
-  C=${PRIMES[-1]}
+  echo "PRIMES is ${PRIMES[*]}"
+  C=${PRIMES[(${#PRIMES[@]} - 1)]}
+  echo "CANDIT is $C"
   NOT_PRIME=true
   while $NOT_PRIME; do
+    echo "C was $C"
     C=$((C + 2))
+    echo "C now $C"
     NOT_PRIME=false
     for P in "${PRIMES[@]}"; do
       if ((P < C / P)) && ((C % P != 0)); then
@@ -22,10 +26,15 @@ find_next_prime()
   echo "$C"
 }
 
-PFD=()
-PRIMES=(2)
-C=3
 N=$1
+PRIMES=(2 3)
+PFD=()
+for P in "${PRIMES[@]}"; do
+  while (( N % P == 0)); do
+    N=$((N / P))
+    PFD+=("$P")
+  done
+done
 while (( N > 1 )); do
   P=$(find_next_prime "${PRIMES[@]}")
   PRIMES+=("$P")
