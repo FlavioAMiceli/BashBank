@@ -36,5 +36,5 @@ while getopts ":m:d:" OPT; do
 	esac
 done
 
-echo "$(pwd | . /usr/bin/norminette)"
+echo "$(pwd | perl /usr/bin/norminette)"
 exit 0
